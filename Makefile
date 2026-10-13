@@ -4,9 +4,9 @@ CC      = cc
 CFLAGS  = -Wall -Wextra -g
 TARGET  = myls
 
-# Modules compiled so far (more are added in later phases).
-SRCS    = main.c options.c util.c entry.c list.c sort.c print.c
-HDRS    = options.h util.h entry.h list.h sort.h print.h
+# Source modules and their headers.
+SRCS    = main.c options.c util.c entry.c list.c sort.c print.c format.c
+HDRS    = options.h util.h entry.h list.h sort.h print.h format.h
 OBJS    = $(SRCS:.c=.o)
 
 all: $(TARGET)
