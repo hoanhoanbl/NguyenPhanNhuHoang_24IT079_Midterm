@@ -107,10 +107,17 @@ fill_row(const struct entry *e, const struct options *opt, struct row *r)
 		snprintf(r->inode, sizeof(r->inode), "%llu",
 		    (unsigned long long)st->st_ino);
 	if (opt->blocks) {
-		/* -h reports sizes in bytes, otherwise disk blocks are used. */
-		if (opt->size_kind == SIZE_HUMAN)
+		/*
+		 * With -h the -s column is human readable: in the short
+		 * format it shows the size in bytes, in the long format the
+		 * space used on disk (as the system ls does).
+		 */
+		if (opt->size_kind == SIZE_HUMAN && !opt->long_format)
 			format_bytes((long long)st->st_size, opt, r->blocks,
 			    sizeof(r->blocks));
+		else if (opt->size_kind == SIZE_HUMAN)
+			format_bytes((long long)st->st_blocks * 512, opt,
+			    r->blocks, sizeof(r->blocks));
 		else
 			format_blocks((long long)st->st_blocks, opt,
 			    r->blocks, sizeof(r->blocks));
