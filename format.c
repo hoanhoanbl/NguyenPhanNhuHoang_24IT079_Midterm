@@ -207,11 +207,6 @@ format_blocks(long long blocks512, const struct options *opt,
 		blocks512 = 0;
 	bytes = (unsigned long long)blocks512 * 512;
 
-	if (opt->size_kind == SIZE_HUMAN) {
-		human_size(bytes, buf, size);
-		return;
-	}
-
 	unit = (opt->size_kind == SIZE_KILO) ? 1024ULL : env_block_size();
 
 	/* Round partial units up. */

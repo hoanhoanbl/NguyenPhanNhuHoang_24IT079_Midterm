@@ -106,9 +106,15 @@ fill_row(const struct entry *e, const struct options *opt, struct row *r)
 	if (opt->inode)
 		snprintf(r->inode, sizeof(r->inode), "%llu",
 		    (unsigned long long)st->st_ino);
-	if (opt->blocks)
-		format_blocks((long long)st->st_blocks, opt, r->blocks,
-		    sizeof(r->blocks));
+	if (opt->blocks) {
+		/* -h reports sizes in bytes, otherwise disk blocks are used. */
+		if (opt->size_kind == SIZE_HUMAN)
+			format_bytes((long long)st->st_size, opt, r->blocks,
+			    sizeof(r->blocks));
+		else
+			format_blocks((long long)st->st_blocks, opt,
+			    r->blocks, sizeof(r->blocks));
+	}
 	if (!opt->long_format)
 		return;
 
@@ -205,17 +211,25 @@ print_row(const struct entry *e, const struct row *r,
 	putchar('\n');
 }
 
-/* Print the "total N" line: blocks used by all the listed files. */
+/*
+ * Print the "total N" line: blocks used by all the listed files, or with -h
+ * the sum of their sizes in bytes (consistent with the -s column).
+ */
 static void
 print_total(const struct entry_list *list, const struct options *opt)
 {
-	long long sum = 0;
+	long long blocks = 0, bytes = 0;
 	char text[40];
 	size_t i;
 
-	for (i = 0; i < list->count; i++)
-		sum += (long long)list->items[i].st.st_blocks;
-	format_blocks(sum, opt, text, sizeof(text));
+	for (i = 0; i < list->count; i++) {
+		blocks += (long long)list->items[i].st.st_blocks;
+		bytes += (long long)list->items[i].st.st_size;
+	}
+	if (opt->size_kind == SIZE_HUMAN)
+		format_bytes(bytes, opt, text, sizeof(text));
+	else
+		format_blocks(blocks, opt, text, sizeof(text));
 	printf("total %s\n", text);
 }
 

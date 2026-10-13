@@ -28,9 +28,9 @@ void format_time(time_t t, char *buf, size_t size);
 
 /*
  * Write a count of 512-byte disk blocks as shown by -s and by the "total"
- * line.  The unit is 1024 with -k, human readable with -h, and otherwise
- * the BLOCKSIZE environment variable (512 by default); partial units are
- * rounded up.
+ * line.  The unit is 1024 with -k, otherwise the BLOCKSIZE environment
+ * variable (512 by default); partial units are rounded up.  (With -h the
+ * caller uses format_bytes() instead, as -h reports sizes in bytes.)
  */
 void format_blocks(long long blocks512, const struct options *opt,
     char *buf, size_t size);
