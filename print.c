@@ -248,13 +248,14 @@ print_entries(const struct entry_list *list, const struct options *opt,
 	struct row *rows;
 	size_t i;
 
+	/* Nothing to print for an empty directory (not even the total). */
+	if (list->count == 0)
+		return;
+
 	/* -l always shows the total; -s only when writing to a terminal. */
 	if (is_directory &&
 	    (opt->long_format || (opt->blocks && isatty(STDOUT_FILENO))))
 		print_total(list, opt);
-
-	if (list->count == 0)
-		return;
 
 	rows = xmalloc(list->count * sizeof(struct row));
 	for (i = 0; i < list->count; i++)
