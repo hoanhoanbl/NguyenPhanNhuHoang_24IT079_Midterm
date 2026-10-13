@@ -23,4 +23,8 @@ $(OBJS): $(HDRS)
 clean:
 	rm -f $(OBJS) $(TARGET)
 
-.PHONY: all clean
+# Compare the program with the system ls on a prepared directory tree.
+test: all
+	sh test.sh
+
+.PHONY: all clean test
