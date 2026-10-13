@@ -1,0 +1,5 @@
+# Object files and compiled binary
+*.o
+myls
+ls
+*.core
