@@ -113,6 +113,27 @@ list_directory(const char *dirpath, const struct options *opt, int show_header)
 	closedir(dp);
 
 	print_list(&list, opt, 1);
+
+	/*
+	 * -R: list the subdirectories after this directory.  Entries come
+	 * from lstat(), so symbolic links to directories are not followed
+	 * (no infinite loops); "." and ".." are never entered.
+	 */
+	if (opt->recursive) {
+		size_t i;
+
+		for (i = 0; i < list.count; i++) {
+			const struct entry *e = &list.items[i];
+
+			if (!S_ISDIR(e->st.st_mode) ||
+			    strcmp(e->name, ".") == 0 ||
+			    strcmp(e->name, "..") == 0)
+				continue;
+			if (list_directory(e->path, opt, 1) != 0)
+				status = 1;
+		}
+	}
+
 	entry_list_free(&list);
 	return status;
 }
@@ -170,8 +191,8 @@ list_operands(int argc, char **argv, const struct options *opt)
 		printed_output = 1;
 	}
 
-	/* Directory names are shown as headers when several operands. */
-	show_header = (argc > 1);
+	/* Directory names are shown as headers with several operands or -R. */
+	show_header = (argc > 1 || opt->recursive);
 	sort_entries(&dirs, opt);
 	for (i = 0; i < (int)dirs.count; i++)
 		if (list_directory(dirs.items[i].path, opt, show_header) != 0)
