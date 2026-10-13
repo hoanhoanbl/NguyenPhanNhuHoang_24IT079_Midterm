@@ -191,8 +191,11 @@ list_operands(int argc, char **argv, const struct options *opt)
 		printed_output = 1;
 	}
 
-	/* Directory names are shown as headers with several operands or -R. */
-	show_header = (argc > 1 || opt->recursive);
+	/*
+	 * Directory names are shown as headers with several operands.
+	 * With -R the subdirectories always get one (see list_directory).
+	 */
+	show_header = (argc > 1);
 	sort_entries(&dirs, opt);
 	for (i = 0; i < (int)dirs.count; i++)
 		if (list_directory(dirs.items[i].path, opt, show_header) != 0)
