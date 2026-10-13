@@ -50,15 +50,13 @@ is_listed(const char *name, const struct options *opt)
 	return 0;
 }
 
-/* Sort a list and print every entry of it. */
+/* Sort a list and print it (is_directory: it is the content of a directory). */
 static void
-print_list(struct entry_list *list, const struct options *opt)
+print_list(struct entry_list *list, const struct options *opt,
+    int is_directory)
 {
-	size_t i;
-
 	sort_entries(list, opt);
-	for (i = 0; i < list->count; i++)
-		print_entry(&list->items[i], opt);
+	print_entries(list, opt, is_directory);
 }
 
 /*
@@ -114,7 +112,7 @@ list_directory(const char *dirpath, const struct options *opt, int show_header)
 	}
 	closedir(dp);
 
-	print_list(&list, opt);
+	print_list(&list, opt, 1);
 	entry_list_free(&list);
 	return status;
 }
@@ -143,10 +141,11 @@ list_operands(int argc, char **argv, const struct options *opt)
 		int rc;
 
 		/*
-		 * -d: do not follow symbolic links.  Otherwise follow them,
-		 * but fall back to the link itself if its target is missing.
+		 * With -d, -l (or -n) and -F a symbolic link operand is not
+		 * followed: the link itself is listed.  Otherwise it is
+		 * followed, falling back to the link if its target is missing.
 		 */
-		if (opt->plain_dirs)
+		if (opt->plain_dirs || opt->long_format || opt->classify)
 			rc = lstat(argv[i], &st);
 		else {
 			rc = stat(argv[i], &st);
@@ -167,7 +166,7 @@ list_operands(int argc, char **argv, const struct options *opt)
 
 	/* Non-directory operands come first. */
 	if (files.count > 0) {
-		print_list(&files, opt);
+		print_list(&files, opt, 0);
 		printed_output = 1;
 	}
 
