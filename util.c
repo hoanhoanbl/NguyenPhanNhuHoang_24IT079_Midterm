@@ -57,5 +57,10 @@ report_error(const char *path)
 	/* Save errno: fprintf could overwrite it before strerror runs. */
 	int saved = errno;
 
-	fprintf(stderr, "%s: %s: %s\n", progname, path, strerror(saved));
+	/* An empty name (ls "") is reported without it, like the system ls. */
+	if (path[0] == '\0')
+		fprintf(stderr, "%s: %s\n", progname, strerror(saved));
+	else
+		fprintf(stderr, "%s: %s: %s\n", progname, path,
+		    strerror(saved));
 }

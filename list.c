@@ -72,18 +72,19 @@ list_directory(const char *dirpath, const struct options *opt, int show_header)
 	DIR *dp;
 	int status = 0;
 
-	dp = opendir(dirpath);
-	if (dp == NULL) {
-		report_error(dirpath);
-		return 1;
-	}
-
+	/* The header comes first, even if the directory cannot be opened. */
 	if (show_header) {
 		if (printed_output)
 			putchar('\n');
 		printf("%s:\n", dirpath);
 	}
 	printed_output = 1;
+
+	dp = opendir(dirpath);
+	if (dp == NULL) {
+		report_error(dirpath);
+		return 1;
+	}
 
 	entry_list_init(&list);
 	for (;;) {
