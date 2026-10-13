@@ -5,8 +5,8 @@ CFLAGS  = -Wall -Wextra -g
 TARGET  = myls
 
 # Modules compiled so far (more are added in later phases).
-SRCS    = main.c options.c util.c
-HDRS    = options.h util.h
+SRCS    = main.c options.c util.c entry.c list.c sort.c print.c
+HDRS    = options.h util.h entry.h list.h sort.h print.h
 OBJS    = $(SRCS:.c=.o)
 
 all: $(TARGET)
