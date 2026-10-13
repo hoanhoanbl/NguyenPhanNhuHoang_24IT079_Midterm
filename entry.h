@@ -7,6 +7,9 @@
 
 #include <stddef.h>
 #include <sys/stat.h>
+#include <time.h>
+
+#include "options.h"
 
 struct entry {
 	char *name;		/* name shown to the user              */
@@ -32,5 +35,11 @@ void entry_list_add(struct entry_list *list, const char *name,
 
 /* Release all memory held by the list and leave it empty. */
 void entry_list_free(struct entry_list *list);
+
+/*
+ * Return the timestamp of an entry selected by kind: modification time,
+ * status change time (-c) or access time (-u).
+ */
+struct timespec entry_time(const struct entry *e, enum time_kind kind);
 
 #endif /* ENTRY_H */

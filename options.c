@@ -30,9 +30,17 @@ parse_options(int argc, char **argv, struct options *opt)
 		case 'f': opt->no_sort = 1; break;
 		case 'i': opt->inode = 1; break;
 		case 'r': opt->reverse = 1; break;
-		case 'S': opt->sort_size = 1; break;
 		case 's': opt->blocks = 1; break;
-		case 't': opt->sort_time = 1; break;
+
+		/* -S and -t choose the sort key: last one wins. */
+		case 'S':
+			opt->sort_size = 1;
+			opt->sort_time = 0;
+			break;
+		case 't':
+			opt->sort_time = 1;
+			opt->sort_size = 0;
+			break;
 
 		/* -c and -u override each other: last one wins. */
 		case 'c': opt->time_kind = TIME_CTIME; break;

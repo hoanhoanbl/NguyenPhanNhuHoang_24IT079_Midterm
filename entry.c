@@ -39,6 +39,20 @@ entry_list_add(struct entry_list *list, const char *name, const char *path,
 	e->st = *st;
 }
 
+struct timespec
+entry_time(const struct entry *e, enum time_kind kind)
+{
+	switch (kind) {
+	case TIME_CTIME:
+		return e->st.st_ctimespec;
+	case TIME_ATIME:
+		return e->st.st_atimespec;
+	case TIME_MTIME:
+	default:
+		return e->st.st_mtimespec;
+	}
+}
+
 void
 entry_list_free(struct entry_list *list)
 {
