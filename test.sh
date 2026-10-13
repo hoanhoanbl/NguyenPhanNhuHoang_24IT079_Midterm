@@ -41,6 +41,18 @@ mkfifo "$DIR/fifo"
 touch -t 202001010000 "$DIR/old"
 touch -t 202501011230 "$DIR/newer"
 
+# Directory without symbolic links, with distinct access times.  Printing a
+# symbolic link (readlink) updates its access time, which would make
+# -u results depend on which program runs first.
+PLAIN=$WORK/plain
+mkdir "$PLAIN"
+: > "$PLAIN/one"
+: > "$PLAIN/two"
+: > "$PLAIN/three"
+touch -a -t 202001010000 "$PLAIN/one"
+touch -a -t 202301010000 "$PLAIN/two"
+touch -a -t 202401010000 "$PLAIN/three"
+
 # ---------------------------------------------------------------------
 # check <args...>: run both programs and compare.
 # ---------------------------------------------------------------------
@@ -74,9 +86,14 @@ for o in -a -A -f -r -t -S -c -u -F -i -s -k -h -l -n -q -w -R -d; do
 done
 
 echo "--- combined options"
-for o in -la -lh -ln -li -ls -lsk -lsh -sk -sh -lF -lS -lSr -ltr -lc -lu \
-    -ltc -ltu -lisaF -lAF -laR -lR -Rd -dR -lq -lw -lkh -lhk; do
+for o in -la -lh -ln -li -ls -lsk -lsh -sk -sh -lF -lS -lSr -ltr -lc \
+    -ltc -lisaF -lAF -laR -lR -Rd -dR -lq -lw -lkh -lhk; do
 	check $o "$DIR"
+done
+
+echo "--- access time (directory without symbolic links)"
+for o in -u -lu -ltu -ltur -lSu -tu; do
+	check $o "$PLAIN"
 done
 
 echo "--- operands"
