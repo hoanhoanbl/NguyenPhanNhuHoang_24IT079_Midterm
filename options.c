@@ -27,7 +27,11 @@ parse_options(int argc, char **argv, struct options *opt)
 		case 'A': opt->almost_all = 1; break;
 		case 'a': opt->all = 1; break;
 		case 'F': opt->classify = 1; break;
-		case 'f': opt->no_sort = 1; break;
+		case 'f':
+			/* Like the system ls, -f also implies -a. */
+			opt->no_sort = 1;
+			opt->all = 1;
+			break;
 		case 'i': opt->inode = 1; break;
 		case 'r': opt->reverse = 1; break;
 		case 's': opt->blocks = 1; break;
@@ -60,15 +64,12 @@ parse_options(int argc, char **argv, struct options *opt)
 		case 'q': opt->nonprint = NONPRINT_QUESTION; break;
 		case 'w': opt->nonprint = NONPRINT_RAW; break;
 
-		/* -R and -d override each other: last one wins. */
-		case 'R':
-			opt->recursive = 1;
-			opt->plain_dirs = 0;
-			break;
-		case 'd':
-			opt->plain_dirs = 1;
-			opt->recursive = 0;
-			break;
+		/*
+		 * -R and -d: the system ls lets -d win whatever the order,
+		 * so -R is simply ignored when -d is given (see below).
+		 */
+		case 'R': opt->recursive = 1; break;
+		case 'd': opt->plain_dirs = 1; break;
 
 		/* -k and -h override each other: rightmost flag wins. */
 		case 'k': opt->size_kind = SIZE_KILO; break;
@@ -78,6 +79,10 @@ parse_options(int argc, char **argv, struct options *opt)
 			return -1;
 		}
 	}
+
+	/* -d lists directories as plain files: nothing to recurse into. */
+	if (opt->plain_dirs)
+		opt->recursive = 0;
 
 	/* -A is always set for the super-user. */
 	if (geteuid() == 0)

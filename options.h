@@ -47,8 +47,9 @@ struct options {
 
 /*
  * Parse argv with getopt(3) and fill *opt.  Options that override each
- * other (-l/-n, -c/-u, -q/-w, -R/-d, -k/-h) are resolved so that the last
- * one given wins.
+ * other (-l/-n, -c/-u, -q/-w, -S/-t, -k/-h) are resolved so that the last
+ * one given wins.  Two behaviours follow the system ls rather than the
+ * manual text: -f implies -a, and -d beats -R in any order.
  *
  * Returns the index in argv of the first operand (file name), or -1 if an
  * unknown option was given.
